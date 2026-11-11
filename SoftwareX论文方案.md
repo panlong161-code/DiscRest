@@ -146,22 +146,25 @@ discrest verify examples/public_78
 
 复述贡献句。然后两句限制：默认后端不是神经网络；密集瞬态仍会进入残差。最后一句将来工作：可选接入已发表的 U-Net 权重，以及带宽延拓。将来工作不要写成已经完成。
 
-## 5. 参考文献（先放这些）
+## 5. 参考文献
 
-方法：
+英文草稿现有 13 条，按正文出现顺序编号。作者自引是 0 条。本机其他 SoftwareX 论文的作者不是本文作者，不写入这篇文献表。BEHM-GAN 的期刊卷期尚未核对，将来工作若点名，再补仓库或核对后的期刊条目。
 
-- Godsill SJ, Rayner PJW. Digital audio restoration: a statistical model-based approach. London: Springer; 1998. https://doi.org/10.1007/978-1-4471-1561-8
-- Moliner E, Välimäki V. A two-stage U-Net for high-fidelity denoising of historical recordings. In: IEEE ICASSP; 2022. https://doi.org/10.1109/ICASSP43922.2022.9746977
-- Moliner E, Välimäki V. BEHM-GAN: bandwidth extension of historical music. 对应仓库 [eloimoliner/bwe_historical_recordings](https://github.com/eloimoliner/bwe_historical_recordings)。正式投稿前核对期刊卷期。
-- Diffusion-based denoising of historical recordings. J Audio Eng Soc. https://doi.org/10.17743/jaes.2022.0198
+1. Godsill SJ, Rayner PJW. 1998. https://doi.org/10.1007/978-1-4471-1561-8
+2. Moliner E, Välimäki V. ICASSP 2022. https://doi.org/10.1109/ICASSP43922.2022.9746977
+3. Miranda BV, Deslandes RA, Irigaray I, Biscainho LWP. J Audio Eng Soc 2025;73(4):220–30. https://doi.org/10.17743/jaes.2022.0198
+4. PD-Cleaner. https://github.com/Visemannen/PD-Cleaner
+5. Gtk Wave Cleaner. https://github.com/AlisterH/gwc
+6. Harris CR, et al. Nature 2020;585:357–62. https://doi.org/10.1038/s41586-020-2649-2
+7. Virtanen P, et al. Nat Methods 2020;17:261–72. https://doi.org/10.1038/s41592-019-0686-2
+8. Butterworth S. Exp Wireless Wireless Eng 1930;7:536–41.
+9. Boll SF. IEEE Trans Acoust Speech Signal Process 1979;27(2):113–20. https://doi.org/10.1109/TASSP.1979.1163209
+10. Boersma P, Weenink D. Praat. https://www.praat.org
+11. Wikimedia Commons 上的 1919 年未修复文件页。
+12. 17 U.S.C. § 1401. https://www.law.cornell.edu/uscode/text/17/1401
+13. Audacity Team. https://www.audacityteam.org
 
-软件形态（你已有的 SoftwareX 译本，用来说明“本地、可复现的软件论文”这一写法，不要写成唱片修复的前身）：
-
-- LQL-Equiv-web，本机计算、数据不上传。https://doi.org/10.1016/j.softx.2026.103085
-- RespAnno，音频界面中人听模型结果并改正。https://doi.org/10.1016/j.softx.2026.103011
-- GANSU Lite，免安装、运行留在用户侧。https://doi.org/10.1016/j.softx.2026.103046
-
-自引规则：上述 SoftwareX 论文作者不是你本人时，只能作为相关工作。DiscRest 发表之后，下一篇才可以自引 DiscRest。
+DiscRest 发表之后，下一篇才可以自引 DiscRest。
 
 ## 6. 仓库最小布局
 
