@@ -1,0 +1,19 @@
+excerpt_start_sec: 98
+excerpt_seconds: 20
+profile_preset: protect
+audacity_default:
+  threshold: 200
+  width: 20
+  regions: 1
+  changed_samples: 5
+audacity_sensitive:
+  threshold: 40
+  width: 20
+  regions: 5575
+  changed_samples: 64842
+disc:
+  repaired: 82
+  protected: 67
+  isolated_click: 82
+  dense_transient: 66
+  sustained_onset: 1

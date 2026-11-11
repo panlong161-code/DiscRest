@@ -1,0 +1,31 @@
+input: input.wav
+output_dir: out
+sample_rate_policy: native
+expected_sample_rate: 44100
+source: synthetic
+rumble:
+  enabled: false
+hum:
+  enabled: false
+declick:
+  enabled: true
+  order: 32
+  threshold: 16.0
+  max_click_ms: 3.0
+  half_width_ms: 0.6
+  window_ms: 100.0
+  dense_per_second: 40
+  protect_dense: true
+decrackle:
+  enabled: false
+dehiss:
+  enabled: true
+  n_fft: 2048
+  hop: 512
+  noise_percentile: 15
+  subtract: 1.0
+  floor: 0.1
+  smooth_bins: 31
+neural:
+  enabled: false
+  checkpoint: null

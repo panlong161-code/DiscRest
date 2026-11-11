@@ -1,0 +1,27 @@
+input: input.wav
+output_dir: out
+sample_rate_policy: native
+expected_sample_rate: 44100
+source: synthetic-surface
+rumble:
+  enabled: true
+  cutoff_hz: 80
+  order: 4
+hum:
+  enabled: true
+  mains_hz: 50
+  harmonics: 3
+  quality: 30
+declick:
+  enabled: true
+  order: 32
+  threshold: 16.0
+  protect_dense: true
+decrackle:
+  enabled: true
+  threshold: 3.0
+dehiss:
+  enabled: false
+neural:
+  enabled: false
+  checkpoint: null

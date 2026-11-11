@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>DiscRest 工作台</title>
+  <style>
+    :root {
+      --paper: #f3ecdf;
+      --ink: #241c16;
+      --muted: #6d6256;
+      --line: #d9cdb8;
+      --card: #faf6ef;
+      --rust: #7d3229;
+      --rust-soft: #f3e4df;
+      --moss: #275443;
+      --shadow: 0 1px 0 rgba(36, 28, 22, 0.04);
+      --serif: "Palatino Linotype", Palatino, "Songti SC", "Noto Serif SC", serif;
+      --sans: "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: var(--paper);
+      color: var(--ink);
+      font-family: var(--sans);
+      font-size: 15px;
+      line-height: 1.5;
+    }
+    header, main { width: min(1120px, calc(100% - 32px)); margin: 0 auto; }
+    header { padding: 36px 0 8px; }
+    .kicker {
+      margin: 0 0 8px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      font-size: 12px;
+      color: var(--muted);
+    }
+    h1 {
+      margin: 0;
+      font-family: var(--serif);
+      font-size: 40px;
+      font-weight: 500;
+      letter-spacing: -0.03em;
+    }
+    header p.lead { max-width: 40rem; color: var(--muted); margin: 10px 0 0; }
+    h2 { font-family: var(--serif); font-size: 22px; font-weight: 500; margin: 0 0 12px; }
+    .modes { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin: 28px 0; }
+    .mode {
+      text-align: left;
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 16px 16px 14px;
+      cursor: pointer;
+      color: inherit;
+      box-shadow: var(--shadow);
+    }
+    .mode strong { display: block; font-size: 18px; margin-bottom: 4px; }
+    .mode span { color: var(--muted); font-size: 14px; }
+    .mode[aria-pressed="true"] { border-color: var(--rust); background: #fff; }
+    .bench { display: grid; grid-template-columns: 340px 1fr; gap: 18px; align-items: start; padding-bottom: 48px; }
+    .panel {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 18px;
+    }
+    label { display: block; font-size: 13px; color: var(--muted); margin: 12px 0 4px; }
+    input[type="number"], select, input[type="file"] {
+      width: 100%;
+      font: inherit;
+      color: inherit;
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 8px 10px;
+    }
+    .row { display: flex; justify-content: space-between; gap: 12px; align-items: center; margin-top: 14px; }
+    .row span { font-size: 14px; }
+    button, .file-btn {
+      font: inherit;
+      border-radius: 999px;
+      border: 1px solid var(--ink);
+      background: var(--ink);
+      color: var(--paper);
+      padding: 8px 14px;
+      cursor: pointer;
+    }
+    button.ghost, .file-btn { background: transparent; color: var(--ink); }
+    button:disabled { opacity: 0.45; cursor: wait; }
+    .actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; }
+    .file-btn input { display: none; }
+    .hint { color: var(--muted); font-size: 13px; min-height: 1.4em; }
+    .lanes { display: grid; gap: 12px; }
+    .lane { border-top: 1px solid var(--line); padding-top: 12px; }
+    .lane:first-child { border-top: 0; padding-top: 0; }
+    .lane p { margin: 0 0 6px; }
+    audio { width: 100%; }
+    .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin: 16px 0; }
+    .stat { background: #fff; border-radius: 10px; padding: 10px; border: 1px solid var(--line); }
+    .stat b { display: block; font-family: var(--serif); font-size: 24px; font-weight: 500; }
+    .stat span { color: var(--muted); font-size: 12px; }
+    .flag { display: inline-block; margin: 2px 6px 0 0; padding: 2px 8px; border-radius: 999px; background: var(--rust-soft); color: var(--rust); font-size: 12px; }
+    .flag.ok { background: #e5f0ea; color: var(--moss); }
+    .meter { display: grid; grid-template-columns: 72px 1fr 64px; gap: 8px; align-items: center; margin: 6px 0; font-size: 13px; }
+    .bar { height: 8px; background: #efe6d8; border-radius: 99px; overflow: hidden; }
+    .bar i { display: block; height: 100%; background: var(--rust); }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 8px; }
+    th, td { text-align: left; padding: 6px 4px; border-bottom: 1px solid var(--line); }
+    th { color: var(--muted); font-weight: 500; }
+    .downloads { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
+    .downloads a { color: var(--rust); }
+    #alert { color: var(--rust); min-height: 1.4em; }
+    footer { width: min(1120px, calc(100% - 32px)); margin: 0 auto 28px; color: var(--muted); font-size: 13px; }
+    @media (max-width: 800px) {
+      .modes, .bench, .stats { grid-template-columns: 1fr; }
+      h1 { font-size: 32px; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <p class="kicker">DiscRest __VERSION__ · 本机工作台</p>
+    <h1>先听被删掉的声音</h1>
+    <p class="lead">五步都在这台机器上完成。残差是输入减去输出。只打开一步时，残差就是这一步拿走的内容。</p>
+  </header>
+  <main>
+    <section class="modes" id="modes"></section>
+    <div class="bench">
+      <section class="panel">
+        <h2>这一次</h2>
+        <p class="hint" id="file-name">还没有音频。</p>
+        <div class="actions">
+          <button type="button" class="ghost" id="load-example">载入这个模式的示例</button>
+          <label class="file-btn">选择 WAV<input id="file" type="file" accept="audio/wav,.wav"></label>
+        </div>
+        <div class="row"><span>去咔嗒</span><input id="declick" type="checkbox" checked></div>
+        <label for="threshold">咔嗒阈值（稳健标准差的倍数）</label>
+        <input id="threshold" type="number" min="1" step="1" value="16">
+        <div class="row"><span>过密则保护，不替换</span><input id="protect" type="checkbox" checked></div>
+        <div class="row"><span>去裂纹</span><input id="decrackle" type="checkbox"></div>
+        <label for="crackle">裂纹阈值</label>
+        <input id="crackle" type="number" min="1" step="0.5" value="10">
+        <div class="row"><span>隆隆声高通</span><input id="rumble" type="checkbox"></div>
+        <label for="cutoff">高通截止（Hz）</label>
+        <input id="cutoff" type="number" min="20" step="5" value="40">
+        <div class="row"><span>交流哼声</span><input id="hum" type="checkbox"></div>
+        <label for="mains">电源频率</label>
+        <select id="mains"><option value="50">50 Hz</option><option value="60">60 Hz</option></select>
+        <div class="row"><span>去嘶声</span><input id="dehiss" type="checkbox"></div>
+        <div class="actions">
+          <button type="button" id="run">开始修复</button>
+        </div>
+        <p id="alert" role="alert"></p>
+      </section>
+      <section class="panel" id="stage">
+        <h2>试听</h2>
+        <p class="hint" id="empty">载入声音后，这里会并排播放原声、修复结果和残差。</p>
+        <div id="done" hidden>
+          <div class="lanes">
+            <div class="lane"><p>原声</p><audio id="a-input" controls></audio></div>
+            <div class="lane"><p>修复</p><audio id="a-restored" controls></audio></div>
+            <div class="lane"><p>残差</p><audio id="a-residual" controls></audio></div>
+            <div class="lane">
+              <p>某一级拿走的声音</p>
+              <div class="actions" id="stage-picks"></div>
+              <audio id="a-stage" controls></audio>
+            </div>
+          </div>
+          <div class="stats" id="stats"></div>
+          <div id="flags"></div>
+          <h2 style="margin-top:18px">声音结构</h2>
+          <p id="profile-line"></p>
+          <p class="hint" id="profile-measures"></p>
+          <div class="actions"><button type="button" class="ghost" id="use-profile">改用建议的模式</button></div>
+          <h2 style="margin-top:18px">各步拿走了多少</h2>
+          <div id="meters"></div>
+          <h2 style="margin-top:18px">咔嗒区间</h2>
+          <p class="hint" id="click-note"></p>
+          <table>
+            <thead><tr><th>时间</th><th>样本</th><th>处理</th><th>理由</th><th>倍数</th></tr></thead>
+            <tbody id="clicks"></tbody>
+          </table>
+          <div class="downloads" id="downloads"></div>
+        </div>
+      </section>
+    </div>
+  </main>
+  <footer>复现实验仍用 <code>discrest verify</code>。工作室不把音频发到别的机器。</footer>
+  <script>
+    const state = { presets: [], current: null, file: null, settings: null };
+
+    const $ = (id) => document.getElementById(id);
+
+    function syncForm() {
+      const s = state.settings;
+      $("declick").checked = !!s.declick.enabled;
+      $("threshold").value = s.declick.threshold ?? 16;
+      $("protect").checked = s.declick.protect_dense !== false;
+      $("decrackle").checked = !!s.decrackle.enabled;
+      $("crackle").value = s.decrackle.threshold ?? 10;
+      $("rumble").checked = !!s.rumble.enabled;
+      $("cutoff").value = s.rumble.cutoff_hz ?? 40;
+      $("hum").checked = !!s.hum.enabled;
+      $("mains").value = String(s.hum.mains_hz ?? 50);
+      $("dehiss").checked = !!s.dehiss.enabled;
+    }
+
+    function readForm() {
+      const s = state.settings;
+      s.declick.enabled = $("declick").checked;
+      s.declick.threshold = Number($("threshold").value);
+      s.declick.protect_dense = $("protect").checked;
+      s.declick.protect_onset = $("protect").checked;
+      s.decrackle.enabled = $("decrackle").checked;
+      s.decrackle.threshold = Number($("crackle").value);
+      s.rumble.enabled = $("rumble").checked;
+      s.rumble.cutoff_hz = Number($("cutoff").value);
+      s.hum.enabled = $("hum").checked;
+      s.hum.mains_hz = Number($("mains").value);
+      s.dehiss.enabled = $("dehiss").checked;
+      s.source = "studio";
+    }
+
+    function selectPreset(preset) {
+      state.current = preset;
+      state.settings = JSON.parse(JSON.stringify(preset.settings));
+      syncForm();
+      for (const button of document.querySelectorAll(".mode")) {
+        button.setAttribute("aria-pressed", button.dataset.id === preset.id ? "true" : "false");
+      }
+    }
+
+    function renderModes() {
+      const root = $("modes");
+      root.replaceChildren();
+      for (const preset of state.presets) {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = "mode";
+        button.dataset.id = preset.id;
+        button.innerHTML = "<strong></strong><span></span>";
+        button.querySelector("strong").textContent = preset.title;
+        button.querySelector("span").textContent = preset.blurb;
+        button.addEventListener("click", () => selectPreset(preset));
+        root.appendChild(button);
+      }
+    }
+
+    async function loadExample() {
+      $("alert").textContent = "";
+      const preset = state.current;
+      const response = await fetch("/api/examples/" + preset.example + ".wav");
+      if (!response.ok) {
+        $("alert").textContent = "示例音频没有找到。";
+        return;
+      }
+      const blob = await response.blob();
+      state.file = new File([blob], preset.example + ".wav", { type: "audio/wav" });
+      $("file-name").textContent = "示例 · " + preset.title;
+    }
+
+    function renderResult(payload) {
+      $("empty").hidden = true;
+      $("done").hidden = false;
+      const base = payload.audio;
+      $("a-input").src = base["input.wav"];
+      $("a-restored").src = base["restored.wav"];
+      const picks = $("stage-picks");
+      picks.replaceChildren();
+      const stageNames = [
+        ["removed_declick.wav", "去咔嗒"],
+        ["removed_decrackle.wav", "去裂纹"],
+        ["removed_rumble.wav", "隆隆声"],
+        ["removed_hum.wav", "哼声"],
+        ["removed_dehiss.wav", "去嘶声"],
+      ];
+      for (const [key, label] of stageNames) {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = "ghost";
+        button.textContent = label;
+        button.addEventListener("click", () => {
+          $("a-stage").src = base[key];
+          $("a-stage").play();
+        });
+        picks.appendChild(button);
+      }
+      $("a-stage").src = base["removed_declick.wav"];
+      const stats = [
+        ["咔嗒", payload.click_count],
+        ["已修", payload.repaired_count],
+        ["保护", payload.protected_count],
+        ["裂纹", payload.crackle_repaired],
+      ];
+      $("stats").replaceChildren();
+      for (const [label, value] of stats) {
+        const node = document.createElement("div");
+        node.className = "stat";
+        const number = document.createElement("b");
+        number.textContent = String(value);
+        const caption = document.createElement("span");
+        caption.textContent = label;
+        node.append(number, caption);
+        $("stats").appendChild(node);
+      }
+      const flags = $("flags");
+      flags.replaceChildren();
+      const list = payload.flags.length ? payload.flags : ["无标记"];
+      for (const flag of list) {
+        const pill = document.createElement("span");
+        pill.className = payload.flags.length ? "flag" : "flag ok";
+        pill.textContent = flag;
+        flags.appendChild(pill);
+      }
+      const reasonText = {
+        "dense-impulses": "密集脉冲",
+        "low-frequency": "低频隆隆",
+        "mains-hum": "交流哼声",
+        "sparse-clicks": "稀疏咔嗒",
+        "little-impairment": "杂音很少",
+      };
+      const presetText = { isolated: "孤立咔嗒", protect: "密集保护", surface: "表面噪声" };
+      const stageText = { declick: "去咔嗒", decrackle: "去裂纹", rumble: "隆隆声", hum: "哼声", dehiss: "去嘶声" };
+      const profile = payload.profile;
+      const why = profile.reasons.map((item) => reasonText[item] || item).join("、");
+      $("profile-line").textContent = "建议用「" + (presetText[profile.preset] || profile.preset) + "」，依据是" + why + "。" +
+        (profile.confident === false ? "测量接近分界。" : "");
+      const reverted = Object.entries(payload.leakage || {})
+        .filter((entry) => entry[1].reverted)
+        .map((entry) => stageText[entry[0]] || entry[0]);
+      let measures = "咔嗒 " + Number(profile.click_rate).toFixed(2) + " 次/秒，40 Hz 以下能量占比 " +
+        Number(profile.rumble_ratio).toFixed(3) + "，哼声突出倍数 " + Number(profile.hum_prominence).toFixed(1);
+      if (reverted.length) measures += "。这些级带走了乐音，已经退回：" + reverted.join("、");
+      $("profile-measures").textContent = measures;
+      $("use-profile").onclick = () => {
+        const preset = state.presets.find((item) => item.id === profile.preset);
+        if (preset) selectPreset(preset);
+      };
+      const rms = payload.removed_rms;
+      const max = Math.max(...Object.values(rms), 1e-9);
+      const names = [
+        ["declick", "去咔嗒"],
+        ["decrackle", "去裂纹"],
+        ["rumble", "隆隆声"],
+        ["hum", "哼声"],
+        ["dehiss", "去嘶声"],
+      ];
+      $("meters").replaceChildren();
+      for (const [key, label] of names) {
+        const row = document.createElement("div");
+        row.className = "meter";
+        const name = document.createElement("span");
+        name.textContent = label;
+        const track = document.createElement("div");
+        track.className = "bar";
+        const fill = document.createElement("i");
+        fill.style.width = Math.min(100, (rms[key] / max) * 100) + "%";
+        track.appendChild(fill);
+        const value = document.createElement("span");
+        value.textContent = Number(rms[key]).toFixed(4);
+        row.append(name, track, value);
+        $("meters").appendChild(row);
+      }
+      const body = $("clicks");
+      body.replaceChildren();
+      for (const row of payload.clicks) {
+        const tr = document.createElement("tr");
+        const reason = row.reason === "dense-transient" ? "密集瞬态" : row.reason === "sustained-onset" ? "起音保护" : "孤立咔嗒";
+        for (const text of [row.time.toFixed(3) + " s", row.start + "–" + row.end, row.action === "protected" ? "保护" : "修复", reason, row.score.toFixed(1)]) {
+          const td = document.createElement("td");
+          td.textContent = text;
+          tr.appendChild(td);
+        }
+        body.appendChild(tr);
+      }
+      const extra = payload.click_count - payload.clicks.length;
+      $("click-note").textContent = extra > 0 ? "表里是前 " + payload.clicks.length + " 条，其余在下载的 clicks.csv。" : "";
+      const links = [
+        ["修复 WAV", "restored.wav"],
+        ["残差 WAV", "residual.wav"],
+        ["咔嗒表", "clicks.csv"],
+        ["Praat 标注", "clicks.textgrid"],
+        ["冻结配置", "run.yaml"],
+      ];
+      $("downloads").replaceChildren();
+      for (const [label, key] of links) {
+        const a = document.createElement("a");
+        a.href = base[key];
+        a.download = key;
+        a.textContent = label;
+        $("downloads").appendChild(a);
+      }
+    }
+
+    async function run() {
+      $("alert").textContent = "";
+      if (!state.file) {
+        $("alert").textContent = "先载入示例，或选择一段 WAV。";
+        return;
+      }
+      readForm();
+      const form = new FormData();
+      form.append("settings", JSON.stringify(state.settings));
+      form.append("audio", state.file, state.file.name);
+      $("run").disabled = true;
+      $("run").textContent = "正在处理";
+      try {
+        const response = await fetch("/api/run", { method: "POST", body: form });
+        const payload = await response.json();
+        if (!response.ok) {
+          $("alert").textContent = payload.error || "处理没有完成。";
+          return;
+        }
+        renderResult(payload);
+      } catch (error) {
+        $("alert").textContent = "工作台没有回应。";
+      } finally {
+        $("run").disabled = false;
+        $("run").textContent = "开始修复";
+      }
+    }
+
+    $("load-example").addEventListener("click", loadExample);
+    $("file").addEventListener("change", () => {
+      const file = $("file").files[0];
+      if (!file) return;
+      state.file = file;
+      $("file-name").textContent = file.name;
+    });
+    $("run").addEventListener("click", run);
+
+    fetch("/api/presets").then((response) => response.json()).then((payload) => {
+      state.presets = payload.presets;
+      renderModes();
+      selectPreset(state.presets[0]);
+    });
+  </script>
+</body>
+</html>
