@@ -8,7 +8,7 @@ SoftwareX 收的是可安装、可复现的软件，不是新的去噪网络。�
 
 中文工作题名：DiscRest：面向数字化唱片的本地分步、可复现音质修复工作台
 
-实现在本目录，版本 0.7.0。合成示例仍用来离线复现三条受控链路。论文主示例是 `examples/archive_78`：1919 年爱迪生唱筒的未修复转录，取 98–118 秒。来源、许可证和截取方式写在该目录的 README。没有盲听。
+实现在本目录，版本 0.7.0。英文稿草稿是 `paper/softwarex-draft.md`，C2 指向 `https://github.com/panlong161-code/DiscRest/tree/v0.7.0`。合成示例仍用来离线复现三条受控链路。论文主示例是 `examples/archive_78`：1919 年爱迪生唱筒的未修复转录，取 98–118 秒。来源和截取方式写在该目录的 README。没有盲听。通讯邮箱和听感句仍由作者填写。
 
 ```text
 python -m discrest verify examples/public_78
@@ -46,7 +46,7 @@ DiscRest 不替换上述算法。它把去咔嗒、去裂纹、隆隆声、哼�
 
 ## 3. 技术路线与软件边界
 
-默认路径只用 NumPy / SciPy，本机处理 WAV，不上传音频。0.2.0 的顺序是：
+默认路径只用 NumPy / SciPy，本机处理 WAV，不上传音频。0.7.0 的顺序是：
 
 1. 去咔嗒：自回归预测误差检测，短区间用 LSAR 插值。过密的窗记为 `protected`，不替换。
 2. 去裂纹：短时中值残差上的小尖峰，向中值衰减。过密时标记 `dense-crackle` 并留下。
@@ -61,20 +61,20 @@ PD-Cleaner 把隆隆声和哼声放在脉冲之前。本实现的零相位滤波
 
 ## 4. 按 SoftwareX 栏目怎么写
 
-全文英文，约 3500–4500 词。图 2 张：流水线图；一段 10 秒公开录音的波形，标出咔嗒和残差。
+全文英文，正文约 3000 词以内。草稿在 `paper/softwarex-draft.md`。图 2 张：流水线图；一段公开录音的波形，标出咔嗒和残差。
 
 ### 代码元数据（投稿表）
 
 | 编号 | 内容 | 拟填写 |
 | --- | --- | --- |
 | C1 | 当前代码版本 | v0.7.0，与论文示例的 git 标签一致 |
-| C2 | 代码永久链接 | 公开 Git 仓库的该标签，不要写浮动的 main |
+| C2 | 代码永久链接 | https://github.com/panlong161-code/DiscRest/tree/v0.7.0 |
 | C3 | 许可 | MIT。若调用 AGPL 的 PD-Cleaner 代码，不要把那段抄进仓库 |
 | C4 | 版本管理 | git |
-| C5 | 语言与工具 | Python 3.11，NumPy，SciPy，PyYAML；可选神经网络后端不随仓库提供权重 |
-| C6 | 运行环境 | 无 GPU 可完成默示示例；可选后端另行列出 CUDA |
-| C7 | 文档 | 仓库 README：安装、一条复现命令、输出文件说明 |
-| C8 | 联系邮箱 | 通讯作者 |
+| C5 | 语言与工具 | 记录哈希的环境是 Python 3.12.7、NumPy 1.26.4、SciPy 1.16.3、PyYAML 6.0.3。可选神经网络后端不随仓库提供权重 |
+| C6 | 运行环境 | 无 GPU 可完成示例。SHA-256 属于上述 Windows 环境；其他系统核对咔嗒数和标记 |
+| C7 | 文档 | 仓库英文 README：安装、一条复现命令、输出文件说明 |
+| C8 | 联系邮箱 | 通讯作者邮箱，投稿前填入，仓库里现在还没有 |
 
 ### 摘要（约 200 词）
 
@@ -109,9 +109,9 @@ PD-Cleaner 把隆隆声和哼声放在脉冲之前。本实现的零相位滤波
 
 1. 分步开关。五步各自开或关，只开一步时残差就是这一步的结果。
 2. 分级试听。整段残差 = 输入 − 输出。每一级另写一份 `removed_*.wav`。`run.yaml` 同时给出每步的移除 RMS。
-3. 冻结配置。示例目录里的 yaml 能复现论文中的输出哈希。
+3. 冻结配置。示例目录里的 yaml 在记录哈希的那台机器上能复现输出哈希；其他机器核对咔嗒数和标记。
 4. 局限写进每一行。过密的窗日志写 `dense-transient`，对应区间 `action` 为 `protected`、`reason` 为 `dense-transient`，并记下误差倍数，样本留在原处。同一批区间另写 `clicks.textgrid`，Praat 可以直接打开。
-5. 先画像再选档。`profile` 测量每秒咔嗒数、40 Hz 以下能量占比、50 Hz 或 60 Hz 谐波突出程度，建议 `isolated`、`protect` 或 `surface`。每次运行把这份画像和每一级的乐音泄漏写进 `run.yaml`。泄漏只作记录，不改音频。
+5. 先画像再选档。`profile` 测量每秒咔嗒数、40 Hz 以下能量占比、50 Hz 或 60 Hz 谐波突出程度，建议 `isolated`、`protect` 或 `surface`。每次运行把这份画像和每一级的乐音泄漏写进 `run.yaml`。隆隆声、哼声和去嘶声若把乐音频点一并拿走，这一级整段退回，并记 leakage-reverted。去咔嗒和去裂纹只记录泄漏。
 
 命令行示例放这里，并保证 README 里是同一条：
 
@@ -120,7 +120,7 @@ discrest run --config examples/public_78/run.yaml
 discrest verify examples/public_78
 ```
 
-`verify` 只检查输出文件是否存在、配置字段是否齐全、结果哈希是否与示例记录一致。本机工作台负责试听；论文里的数字仍从 `verify` 抄，不要从一次界面操作里估。
+`verify` 在每台机器上检查输出文件、咔嗒数和标记。SHA-256 只在 `expected.yaml` 里的 `recorded_platform` 上比对。本机工作台负责试听；论文里的数字仍从 `verify` 抄，不要从一次界面操作里估。
 
 ### 3. Illustrative examples
 
@@ -130,9 +130,9 @@ discrest verify examples/public_78
 
 听感一句先空着。作者听完 `out/restored.wav` 和 `out/residual.wav` 后，用自己的话写残差里还有没有乐句，并写明只有一名作者听过，不是盲听。软件不代写这句。
 
-示例 B 仍用合成的 `examples/dense_transient`：726 个短区间里 701 个被保护。它说明过密时的行为，不代替示例 A。
+示例 B 用合成的 `examples/surface`：修复 3 个咔嗒和 3 处裂纹，隆隆声移除 RMS 约为 0.094，哼声约为 0.021。它补上主示例没有打开的滤波和裂纹。`examples/dense_transient` 另有 726 个短区间里 701 个被保护，用来说明过密时的行为。
 
-示例 C 就是 `python -m discrest verify examples/archive_78`。通过时，修复结果、残差和咔嗒表的 SHA-256 与 `expected.yaml` 一致。这组哈希来自这一台 Windows 机器上的这次运行。
+示例 C 就是 `python -m discrest verify examples/archive_78`。咔嗒数和标记在每台机器上核对。SHA-256 与 `expected.yaml` 的一致限于记录哈希的 Windows 环境：Python 3.12.7、NumPy 1.26.4、SciPy 1.16.3。
 
 ### 4. Impact
 

@@ -1,3 +1,7 @@
+recorded_platform: win32
+recorded_python: "3.12.7"
+recorded_numpy: "1.26.4"
+recorded_scipy: "1.16.3"
 click_count: 726
 flags:
 - dense-transient

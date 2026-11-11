@@ -1,8 +1,8 @@
-# 密集瞬态
+# Dense transients
 
-`input.wav` 是 4 秒合成音。1.0 秒到 2.0 秒之间每 80 个样本有一个短脉冲，用来观察鼓点或密裂纹会被怎样标出。
+`input.wav` is 4 seconds of synthetic audio. From 1.0 to 2.0 seconds an impulse occurs every 80 samples, so the run can show how a drum hit or dense crackle is labeled.
 
-这一配置只做去咔嗒，并且 `protect_dense` 为真。当前运行列出 726 个短区间：701 个在过密的窗里，`action` 为 `protected`，样本没有被改写；25 个被修复。另有 13 个长于 3 ms 的区间没有进入列表。日志为 `dense-transient`。
+The configuration runs declick only, with `protect_dense` enabled. This run lists 726 short regions. 701 fall in dense windows, have action `protected`, and are not rewritten. 25 are repaired. Another 13 regions longer than 3 ms are not replaced. The flag is `dense-transient`.
 
 ```text
 python -m discrest run --config examples/dense_transient/run.yaml

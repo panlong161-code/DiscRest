@@ -11,7 +11,7 @@ from discrest.audio import write_wav
 from discrest.cli import main
 from discrest.config import ConfigError, DehissSettings, load_config
 from discrest.dehiss import dehiss_channel
-from discrest.pipeline import process, verify_example
+from discrest.pipeline import keys_checked, process, verify_example
 from discrest.synthetic import clicked_tone
 
 
@@ -136,6 +136,13 @@ def test_neural_backend_does_not_invent_audio(tmp_path: Path) -> None:
         encoding="utf-8",
     )
     assert main(["run", "--config", str(tmp_path / "run.yaml")]) == 2
+
+
+def test_hashes_are_compared_only_on_the_recorded_platform() -> None:
+    expected = {"recorded_platform": "win32"}
+    assert "restored_sha256" in keys_checked(expected, platform="win32")
+    assert "restored_sha256" not in keys_checked(expected, platform="linux")
+    assert "click_count" in keys_checked(expected, platform="linux")
 
 
 def test_verify_reports_a_missing_record(tmp_path: Path) -> None:

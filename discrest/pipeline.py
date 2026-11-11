@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import sys
 from pathlib import Path
 from typing import Any
 
@@ -238,6 +239,19 @@ def run_config(config: RunConfig) -> dict[str, Any]:
     return record
 
 
+_HASH_KEYS = ("restored_sha256", "residual_sha256", "clicks_sha256")
+_COUNT_KEYS = ("click_count", "flags")
+
+
+def keys_checked(expected: dict[str, Any], platform: str | None = None) -> tuple[str, ...]:
+    """Compare SHA-256 only on the platform that recorded the hashes."""
+    current = sys.platform if platform is None else platform
+    recorded = expected.get("recorded_platform")
+    if recorded in (None, "") or recorded == current:
+        return _HASH_KEYS + _COUNT_KEYS
+    return _COUNT_KEYS
+
+
 def verify_example(example_dir: str | Path) -> tuple[bool, str]:
     folder = Path(example_dir).resolve()
     config_path = folder / "run.yaml"
@@ -252,7 +266,7 @@ def verify_example(example_dir: str | Path) -> tuple[bool, str]:
         return False, str(exc)
     if not isinstance(expected, dict):
         return False, "expected.yaml must be a mapping"
-    required = ("restored_sha256", "residual_sha256", "clicks_sha256", "click_count", "flags")
+    required = _HASH_KEYS + _COUNT_KEYS
     missing = [key for key in required if key not in expected]
     if missing:
         return False, "expected.yaml missing " + ", ".join(missing)
@@ -264,7 +278,8 @@ def verify_example(example_dir: str | Path) -> tuple[bool, str]:
         "click_count": record["click_count"],
         "flags": record["flags"],
     }
-    mismatched = [key for key in required if checks[key] != expected[key]]
+    compared = keys_checked(expected)
+    mismatched = [key for key in compared if checks[key] != expected[key]]
     output_dir = Path(record["output_dir"])
     present = all((output_dir / name).is_file() for name in ("restored.wav", "residual.wav", "clicks.csv", "run.yaml", "log.txt"))
     if not present:
@@ -273,8 +288,12 @@ def verify_example(example_dir: str | Path) -> tuple[bool, str]:
         detail = ", ".join(f"{key}: got {checks[key]!r}" for key in mismatched)
         return False, "mismatch " + detail
     flag_text = ",".join(record["flags"]) if record["flags"] else "none"
+    recorded = expected.get("recorded_platform")
+    hash_note = ""
+    if recorded not in (None, "") and recorded != sys.platform:
+        hash_note = f" hashes_recorded_on={recorded}"
     return True, (
         f"verify: ok clicks={record['click_count']} "
-        f"flags={flag_text} "
+        f"flags={flag_text}{hash_note} "
         f"restored_sha256={outputs['restored_sha256']}"
     )

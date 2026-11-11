@@ -1,3 +1,7 @@
+recorded_platform: win32
+recorded_python: "3.12.7"
+recorded_numpy: "1.26.4"
+recorded_scipy: "1.16.3"
 click_count: 3
 flags: []
 restored_sha256: 4c6f80881eec7f07d28116dab0fb130bbd45ac46eb1ab77f104656a9f6827fc0
