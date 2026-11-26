@@ -26,16 +26,6 @@ python -m discrest verify examples/loc_victor_78
 
 `verify` checks that the output files exist and that the click count and flags match `expected.yaml`. SHA-256 hashes are compared only when the platform, Python, NumPy, and SciPy versions match the recorded environment (Windows, Python 3.12.4, NumPy 2.0.0, SciPy 1.17.1). Otherwise the command checks the counts and flags, and reports the platform on which hashes were recorded.
 
-## Paper supplement
-
-The controlled click-detection noise sweep is in `supplementary/noise_sensitivity_sweep.py`:
-
-```text
-python supplementary/noise_sensitivity_sweep.py
-```
-
-It uses a synthetic 440 Hz tone with 12 clicks across five noise levels and three seeds. The results describe detector behavior in this controlled signal only; they are not a listening study or evidence of perceptual quality on real recordings.
-
 ## Presets
 
 | Preset | Use when | Stages enabled |
@@ -115,6 +105,16 @@ The code for version 0.8.1 is https://github.com/panlong161-code/DiscRest/tree/v
 Godsill SJ, Rayner PJW. Digital Audio Restoration. Springer; 1998. https://doi.org/10.1007/978-1-4471-1561-8
 
 Moliner E, Välimäki V. A two-stage U-Net for high-fidelity denoising of historical recordings. IEEE ICASSP; 2022. https://doi.org/10.1109/ICASSP43922.2022.9746977
+
+## Runtime measurements
+
+Re-run the five example timings with:
+
+```text
+python supplementary/benchmark_runtime.py --output supplementary/runtime_results.csv --repetitions 3
+```
+
+The script checks each run against the recorded click counts and flags, writes isolated outputs under a temporary directory, and saves CSV measurements plus a JSON environment record. Timing covers the processing call, artifact writing, and SHA-256 hashing; it excludes interpreter startup and imports. The manuscript's reference measurements and environment are archived in `supplementary/runtime_reference.csv` and `supplementary/runtime_reference.json`. Runtime is hardware- and environment-specific.
 
 ## Tests
 

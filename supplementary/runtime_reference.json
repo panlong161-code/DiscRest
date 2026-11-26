@@ -1,0 +1,71 @@
+{
+  "platform": "Windows-11-10.0.26300-SP0",
+  "processor": "13th Gen Intel(R) Core(TM) i5-1340P",
+  "python": "3.12.7",
+  "numpy": "1.26.4",
+  "scipy": "1.16.3",
+  "pyyaml": "6.0.3",
+  "timing_scope": "run_config only; includes artifact writing and SHA-256 hashing, excludes interpreter startup and imports",
+  "results": [
+    {
+      "example": "archive_78",
+      "duration_s": 20.0,
+      "repetitions": 3,
+      "runs_s": [
+        3.173061,
+        4.223637,
+        3.931416
+      ],
+      "median_s": 3.931415500002913,
+      "speed_x_real_time": 5.08722621660956
+    },
+    {
+      "example": "public_cyl",
+      "duration_s": 20.0,
+      "repetitions": 3,
+      "runs_s": [
+        3.49886,
+        2.976762,
+        2.766392
+      ],
+      "median_s": 2.9767621000064537,
+      "speed_x_real_time": 6.718709567001219
+    },
+    {
+      "example": "dense_transient",
+      "duration_s": 17.424739229024944,
+      "repetitions": 3,
+      "runs_s": [
+        6.231059,
+        7.446099,
+        11.234646
+      ],
+      "median_s": 7.446098799991887,
+      "speed_x_real_time": 2.3401165760846374
+    },
+    {
+      "example": "surface",
+      "duration_s": 20.0,
+      "repetitions": 3,
+      "runs_s": [
+        2.354201,
+        2.231862,
+        2.320033
+      ],
+      "median_s": 2.3200325000216253,
+      "speed_x_real_time": 8.620568892812312
+    },
+    {
+      "example": "loc_victor_78",
+      "duration_s": 30.0,
+      "repetitions": 3,
+      "runs_s": [
+        3.772589,
+        3.937668,
+        3.815865
+      ],
+      "median_s": 3.8158652000129223,
+      "speed_x_real_time": 7.861912941761781
+    }
+  ]
+}

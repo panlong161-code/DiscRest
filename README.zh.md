@@ -48,16 +48,6 @@ python -m discrest verify examples/loc_victor_78
 
 `verify` 在每台机器上核对输出文件、咔嗒数和标记。只有平台、Python、NumPy、SciPy 版本都与记录哈希的环境完全一致（Windows、Python 3.12.4、NumPy 2.0.0、SciPy 1.17.1）时才比对 SHA-256；否则仍核对计数和标记。
 
-## 论文补充实验
-
-受控点击噪声敏感性实验脚本位于 `supplementary/noise_sensitivity_sweep.py`，在仓库根目录运行：
-
-```text
-python supplementary/noise_sensitivity_sweep.py
-```
-
-实验使用 440 Hz 合成单音、12 个点击、5 档噪声和 3 个随机种子。结果只描述该受控信号上的检测表现，不是盲听研究，也不能据此声称真实录音的主观音质已得到验证。
-
 `examples/public_cyl` 是 1910 年 Edison Amberol 473《My south polar expedition》的 20 秒，UCSB 圆柱 1859。只开去咔嗒。档案馆的访问副本已在 40 Hz 以下滤过，所以这次运行把 14 个区间全部修复，没有标记；低频几级改在 `examples/loc_victor_78` 上演示。
 
 `examples/dense_transient` 是 1906 年 Columbia 圆柱《'Tis but a dream》的 17.4 秒，UCSB 13692，一张磨损很重的唱片。检测列出 552 个区间，其中 485 个落在 45 个密集窗里被保护，67 个被修复；另有 28 个长于 3 ms 的区间没有替换。日志是 `dense-transient`。
@@ -140,6 +130,16 @@ python -m discrest audition examples/archive_78
 Godsill SJ, Rayner PJW. Digital Audio Restoration. Springer; 1998. https://doi.org/10.1007/978-1-4471-1561-8
 
 Moliner E, Välimäki V. A two-stage U-Net for high-fidelity denoising of historical recordings. IEEE ICASSP; 2022. https://doi.org/10.1109/ICASSP43922.2022.9746977
+
+## 运行耗时
+
+用以下命令重新测量五个示例：
+
+```text
+python supplementary/benchmark_runtime.py --output supplementary/runtime_results.csv --repetitions 3
+```
+
+脚本会核对每次运行的咔嗒数和标记，在临时目录写输出，并生成 CSV 耗时记录和 JSON 环境记录。计时包括处理、产物写入和 SHA-256 校验，不包括解释器启动与模块导入。论文中的参考测量及环境保存在 `supplementary/runtime_reference.csv` 和 `supplementary/runtime_reference.json`；耗时会随硬件和软件环境变化。
 
 ## 测试
 
