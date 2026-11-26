@@ -26,6 +26,16 @@ python -m discrest verify examples/loc_victor_78
 
 `verify` checks that the output files exist and that the click count and flags match `expected.yaml`. SHA-256 hashes are compared only when the platform, Python, NumPy, and SciPy versions match the recorded environment (Windows, Python 3.12.4, NumPy 2.0.0, SciPy 1.17.1). Otherwise the command checks the counts and flags, and reports the platform on which hashes were recorded.
 
+## Paper supplement
+
+The controlled click-detection noise sweep is in `supplementary/noise_sensitivity_sweep.py`:
+
+```text
+python supplementary/noise_sensitivity_sweep.py
+```
+
+It uses a synthetic 440 Hz tone with 12 clicks across five noise levels and three seeds. The results describe detector behavior in this controlled signal only; they are not a listening study or evidence of perceptual quality on real recordings.
+
 ## Presets
 
 | Preset | Use when | Stages enabled |

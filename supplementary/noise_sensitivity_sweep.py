@@ -1,7 +1,10 @@
 """Reproduce the controlled click-detection noise sweep reported in the paper.
 
 Run from the project root with:
-    python paper/noise_sensitivity_sweep.py
+    python supplementary/noise_sensitivity_sweep.py
+
+This controlled 440 Hz tone experiment measures detector behavior; it is not
+a perceptual-quality evaluation or evidence about real-recording performance.
 """
 
 from __future__ import annotations
@@ -93,7 +96,10 @@ def main() -> None:
             detections += tp
             false_positives += fp
             misses += fn
-            gains.append(snr_db(clean, result["restored"][:, 0]) - snr_db(clean, observed))
+            gains.append(
+                snr_db(clean, result["restored"][:, 0])
+                - snr_db(clean, observed)
+            )
 
         background_snr = 20.0 * np.log10(
             np.sqrt(np.mean(np.square(clean))) / sigma

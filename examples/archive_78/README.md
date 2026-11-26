@@ -12,7 +12,7 @@ The comparison is a reimplementation of Craig DeForest’s Audacity 2.1.0 `Remov
 
 The recorded run lists 149 regions: 82 `isolated-click` repaired, 66 `dense-transient` protected, and 1 `sustained-onset` protected. Declick removed RMS is about 0.0043. The share of removed declick energy that falls on the remaining musical band is 0.0335, so the stage is not reverted.
 
-There is no blind listening test. The author still has to listen to `out/restored.wav` and `out/residual.wav` and write whether a musical phrase remains in the residual, stating that only one author listened.
+No blind listening test or multi-listener assessment was conducted for this example. The reported results therefore describe the recorded measurements and do not establish perceived audio quality.
 
 ```text
 python -m discrest verify examples/archive_78

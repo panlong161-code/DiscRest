@@ -10,4 +10,4 @@
 
 对照算法是 Audacity 2.1.0 的 Click Removal，按 Craig DeForest 的 `RemoveClicks` 实现，默认阈值 200、宽度 20。它不是 Audacity 程序本身。另记一档更敏感的阈值 40，用来说明把同一个算法调灵敏之后会改掉多少样本。数字在 `comparison.yaml`，由测试重算。
 
-这里没有盲听，也没有代写“残差里还能听见乐句”。作者要听 `out/restored.wav` 和 `out/residual.wav` 之后，自己补那一句。
+本示例没有进行盲听或多听者评价。因此，这里的结果仅报告可复现的测量指标，不代表主观听感质量已经得到验证。
