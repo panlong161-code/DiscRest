@@ -2,7 +2,7 @@ input: input.wav
 output_dir: out
 sample_rate_policy: native
 expected_sample_rate: 44100
-source: synthetic-dense-burst
+source: ucsb-cyl-13692
 rumble:
   enabled: false
 hum:

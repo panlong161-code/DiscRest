@@ -31,7 +31,7 @@ def test_each_example_suggests_its_own_preset() -> None:
 
 
 def test_profile_command_names_the_public_example(capsys) -> None:
-    code = main(["profile", "--input", str(ROOT / "examples" / "public_78" / "input.wav")])
+    code = main(["profile", "--input", str(ROOT / "examples" / "public_cyl" / "input.wav")])
     assert code == 0
     text = capsys.readouterr().out
     assert "preset: isolated" in text

@@ -1,4 +1,7 @@
-"""Deterministic signals used by the tests and the bundled examples."""
+"""Deterministic signals used by the tests.
+
+The bundled examples are real transfers; nothing here writes into ``examples/``.
+"""
 
 from __future__ import annotations
 
@@ -94,14 +97,19 @@ def surface_example_signal(rate: int = 44100) -> np.ndarray:
     return signal
 
 
-def write_bundled_inputs(root: Path) -> None:
+def write_test_signals(root: Path) -> None:
+    """Write the synthetic signals to ``build/synthetic`` for inspection.
+
+    The bundled examples use real transfers, so this helper no longer touches
+    ``examples/``. It cannot overwrite a recording.
+    """
+    target = root / "build" / "synthetic"
+    target.mkdir(parents=True, exist_ok=True)
     public, _spans = public_example_signal()
-    write_wav_mono(root / "examples" / "public_78" / "input.wav", 44100, public)
-    dense = dense_example_signal()
-    write_wav_mono(root / "examples" / "dense_transient" / "input.wav", 44100, dense)
-    surface = surface_example_signal()
-    write_wav_mono(root / "examples" / "surface" / "input.wav", 44100, surface)
+    write_wav_mono(target / "public.wav", 44100, public)
+    write_wav_mono(target / "dense.wav", 44100, dense_example_signal())
+    write_wav_mono(target / "surface.wav", 44100, surface_example_signal())
 
 
 if __name__ == "__main__":
-    write_bundled_inputs(Path(__file__).resolve().parents[1])
+    write_test_signals(Path(__file__).resolve().parents[1])

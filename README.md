@@ -2,9 +2,9 @@
 
 DiscRest is a local workbench for recordings that have already been digitized. Five stages can be switched independently: declick, decrackle, a rumble high-pass, a mains-hum notch, and dehiss. Each run writes the restored signal, the full residual, the audio removed by each stage, a click table with a reason for every region, and a frozen configuration. Audio stays on the machine that runs the command.
 
-Version 0.7.0. License: MIT. The three presets and the local studio share the command-line settings. `profile` suggests a preset before any audio is written. When a measurement sits near a threshold, the profile is marked not confident.
+Version 0.8.1. License: MIT. The three presets and the local studio share the command-line settings. `profile` suggests a preset before any audio is written. When a measurement sits near a threshold, the profile is marked not confident.
 
-The public example is `examples/archive_78`, a 20-second excerpt from an unrestored 1919 cylinder. The same excerpt is counted with a reimplementation of the Audacity 2.1 `RemoveClicks` algorithm. That count is not a session in the Audacity application.
+The public example is `examples/archive_78`, a 20-second excerpt from an unrestored 1919 cylinder. The same excerpt is counted with a reimplementation of the Audacity 2.1.0 `RemoveClicks` algorithm. That count is not a session in the Audacity application. Four bundled inputs are archival recordings; `examples/loc_victor_78` is derived from a Library of Congress transfer with controlled synthetic impairments added by `overlay.py`.
 
 ## Install
 
@@ -19,11 +19,12 @@ To run the examples without the test tools, install NumPy, SciPy, and PyYAML, th
 ```text
 python -m discrest verify examples/archive_78
 python -m discrest verify examples/surface
-python -m discrest verify examples/public_78
+python -m discrest verify examples/public_cyl
 python -m discrest verify examples/dense_transient
+python -m discrest verify examples/loc_victor_78
 ```
 
-`verify` checks that the output files exist and that the click count and flags match `expected.yaml`. SHA-256 hashes are compared on the platform that recorded them: Windows, Python 3.12.7, NumPy 1.26.4, SciPy 1.16.3. On another platform the command still checks the counts and flags, and it prints `hashes_recorded_on=win32`.
+`verify` checks that the output files exist and that the click count and flags match `expected.yaml`. SHA-256 hashes are compared only when the platform, Python, NumPy, and SciPy versions match the recorded environment (Windows, Python 3.12.4, NumPy 2.0.0, SciPy 1.17.1). Otherwise the command checks the counts and flags, and reports the platform on which hashes were recorded.
 
 ## Presets
 
@@ -35,8 +36,8 @@ python -m discrest verify examples/dense_transient
 
 ```text
 python -m discrest presets
-python -m discrest profile --input examples/public_78/input.wav
-python -m discrest run --preset isolated --input examples/public_78/input.wav --output-dir out
+python -m discrest profile --input examples/public_cyl/input.wav
+python -m discrest run --preset isolated --input examples/public_cyl/input.wav --output-dir out
 python -m discrest ui
 ```
 
@@ -48,11 +49,13 @@ python -m discrest ui
 
 `examples/archive_78` is the paper example. Seconds 98–118 of the unrestored 1919 Edison Blue Amberol transfer are processed with the protect preset. The run lists 149 regions: 82 repaired as `isolated-click`, 66 left in place as `dense-transient`, and 1 left in place as `sustained-onset`. Provenance and the United States public-domain limit are in that directory's README.
 
-`examples/public_78` is an 8-second synthetic tone with 12 isolated clicks. Declick and dehiss are on. The run repairs 12 regions.
+`examples/public_cyl` is 20 seconds of the 1910 Edison Amberol 473 transfer of “My south polar expedition”, UCSB cylinder 1859. Declick is on. The archive's access copy has already been filtered below 40 Hz, so the run repairs all 14 regions and raises no flag; the low-frequency stages are exercised on `examples/loc_victor_78` instead.
 
-`examples/dense_transient` places an impulse every 80 samples for one second. The run lists 726 short regions. 701 fall in dense windows and stay in place. 25 are repaired. 13 regions longer than 3 ms are not replaced. The flag is `dense-transient`.
+`examples/dense_transient` is 17.4 seconds of a worn 1906 Columbia cylinder, “‘Tis but a dream”, UCSB 13692. The run lists 552 regions, protects 485 in 45 dense windows, and repairs 67. 28 regions longer than 3 ms are not replaced. The flag is `dense-transient`.
 
-`examples/surface` is a 4-second synthetic tone with 30 Hz rumble, 50 Hz and 150 Hz hum, 3 clicks, and 3 smaller crackles. The run repairs 3 click regions and 3 crackles. In `out/run.yaml` the rumble removed RMS is about 0.094 and the hum removed RMS is about 0.021.
+`examples/surface` is 20 seconds of a real 78 rpm transfer with strong mains hum, Freesound 18627 under CC0. The 50 Hz notch and decrackle run: hum prominence falls from 33.88 to 1.19, 7 crackles are repaired, and no flag is raised. The high-pass stays off because the file has nothing below 40 Hz to remove.
+
+`examples/loc_victor_78` exercises the rumble, hum, and dehiss stages on a real Library of Congress transfer of Victor 73978 (matrix B-28269). Seconds 38–68 are kept. The delivered file is a master with the low band already filtered, so `overlay.py` adds low-frequency, mains, and broadband noise at the levels it reports; the untouched base is kept next to the sum, which is what allows a true SNR to be computed. `profile` reports `low-frequency, mains-hum`. The run takes `rumble_ratio` from 0.1781 to 0.0006 and `hum_prominence` from 11.96 to 1.60, with the hum leakage guard held off by `occupied = 0.0000`. The dehiss stage is a negative result on this material: SNR falls from 20.00 to 15.32 dB because the span has no quiet frames for the noise estimate. Details are in that directory's README.
 
 ## Outputs
 
@@ -68,6 +71,23 @@ python -m discrest ui
 
 Sample-rate policy: `native` keeps the file rate, `require` stops when the rate is not `expected_sample_rate`, and `resample` converts to that rate while recording the original rate.
 
+## Hearing what was removed
+
+Two things make the repair hard to hear, and neither is a fault in the run:
+
+1. `removed_*.wav` is written for all five stages, including the stages that were off. A stage that did not run writes exact zeros, so `removed_hum.wav` from `examples/archive_78` is silent because the hum stage was off, not because hum was absent from the audio.
+2. What a working stage removes is small next to the music. On `examples/archive_78` the declick stage removes 0.49% of the samples at −47 dBFS, so `restored.wav` and `input.wav` differ by 0.02 dB overall. On `examples/loc_victor_78` the rumble stage removes 0.064 RMS, the output is 2.5 dB quieter, and the difference sits below 80 Hz where laptop speakers do not reproduce anything.
+
+`audition` writes a listening kit for one example. It peak-normalises the removed audio, cuts 1.6 s around the largest repair, and plots a spectrogram:
+
+```text
+python -m discrest audition examples/archive_78
+```
+
+The kit lands in `examples/archive_78/listen/`: `4_removed_<stage>_boosted.wav` for every stage that ran, `5`–`7` for the excerpt (input, restored, removed), `8_spectrum.png`, and `index.html` with players and the per-stage levels. Gain is printed on the page; the waveform is not altered in any other way.
+
+`audition` is the only command with an extra dependency: it needs `soundfile`, installed with `pip install "discrest[audition]"`. The five processing stages themselves need only NumPy, SciPy, and PyYAML.
+
 ## Processing order
 
 Declick, then decrackle, then the rumble high-pass, then the hum notch, then dehiss. Impulses are repaired before the zero-phase filters, because those filters spread a click into ringing that the click detector would count again.
@@ -78,9 +98,9 @@ A short region whose following 30 ms is much louder than the preceding 30 ms is 
 
 ## Support
 
-The SoftwareX code-metadata table needs the corresponding author's email. That address is not in this repository yet. Until it is added, questions can be opened at https://github.com/panlong161-code/DiscRest/issues.
+Questions and support inquiries can be directed to Long Pan (`540432274@qq.com`) or opened at https://github.com/panlong161-code/DiscRest/issues.
 
-The code for version 0.7.0 is https://github.com/panlong161-code/DiscRest/tree/v0.7.0.
+The code for version 0.8.1 is https://github.com/panlong161-code/DiscRest/tree/v0.8.1.
 
 Godsill SJ, Rayner PJW. Digital Audio Restoration. Springer; 1998. https://doi.org/10.1007/978-1-4471-1561-8
 

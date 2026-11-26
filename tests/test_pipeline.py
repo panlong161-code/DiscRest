@@ -7,6 +7,7 @@ from pathlib import Path
 import numpy as np
 import yaml
 
+from discrest import __version__
 from discrest.audio import write_wav
 from discrest.cli import main
 from discrest.config import ConfigError, DehissSettings, load_config
@@ -111,7 +112,7 @@ neural:
     for name in ("restored.wav", "residual.wav", "clicks.csv", "run.yaml", "log.txt"):
         assert (tmp_path / "out" / name).is_file()
     assert "input_sha256" in first
-    assert first["version"] == "0.7.0"
+    assert first["version"] == __version__
     assert "removed_rms" in first
     text = (tmp_path / "out" / "clicks.csv").read_text(encoding="utf-8")
     assert text.startswith("channel,start_sample,end_sample,time_sec,action,reason,score\n")
@@ -138,11 +139,33 @@ def test_neural_backend_does_not_invent_audio(tmp_path: Path) -> None:
     assert main(["run", "--config", str(tmp_path / "run.yaml")]) == 2
 
 
-def test_hashes_are_compared_only_on_the_recorded_platform() -> None:
-    expected = {"recorded_platform": "win32"}
-    assert "restored_sha256" in keys_checked(expected, platform="win32")
-    assert "restored_sha256" not in keys_checked(expected, platform="linux")
-    assert "click_count" in keys_checked(expected, platform="linux")
+def test_hashes_are_compared_only_in_the_recorded_environment() -> None:
+    expected = {
+        "recorded_platform": "win32",
+        "recorded_python": "3.12.4",
+        "recorded_numpy": "2.0.0",
+        "recorded_scipy": "1.17.1",
+    }
+    exact = keys_checked(
+        expected,
+        platform="win32",
+        python_version="3.12.4",
+        numpy_version="2.0.0",
+        scipy_version="1.17.1",
+    )
+    other_platform = keys_checked(expected, platform="linux")
+    other_numpy = keys_checked(
+        expected,
+        platform="win32",
+        python_version="3.12.4",
+        numpy_version="1.26.4",
+        scipy_version="1.17.1",
+    )
+    assert "restored_sha256" in exact
+    assert "restored_sha256" not in other_platform
+    assert "restored_sha256" not in other_numpy
+    assert "click_count" in other_platform
+    assert "click_count" in other_numpy
 
 
 def test_verify_reports_a_missing_record(tmp_path: Path) -> None:

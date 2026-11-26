@@ -13,7 +13,7 @@ from discrest.audio import write_wav
 from discrest.cli import main
 from discrest.presets import get_preset, run_preset
 from discrest.studio import make_server
-from discrest.synthetic import clicked_tone
+from discrest.synthetic import clicked_tone, surface_example_signal, write_wav_mono
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -46,14 +46,18 @@ def test_presets_are_listed_and_isolated_repairs_the_public_example(tmp_path: Pa
     preset = get_preset("isolated")
     assert preset["settings"]["dehiss"]["enabled"] is True
     assert get_preset("protect")["settings"]["declick"]["protect_dense"] is True
-    record = run_preset("isolated", ROOT / "examples" / "public_78" / "input.wav", tmp_path)
-    assert record["click_count"] == 12
+    record = run_preset("isolated", ROOT / "examples" / "public_cyl" / "input.wav", tmp_path)
+    assert record["click_count"] == 14
     assert record["flags"] == []
     assert (tmp_path / "restored.wav").is_file()
 
 
 def test_surface_preset_separates_clicks_and_crackle(tmp_path: Path) -> None:
-    record = run_preset("surface", ROOT / "examples" / "surface" / "input.wav", tmp_path)
+    # The bundled surface example is now a real 78 rpm transfer, so the preset
+    # is exercised on the constructed signal it was tuned for.
+    source = tmp_path / "synthetic_surface.wav"
+    write_wav_mono(source, 44100, surface_example_signal())
+    record = run_preset("surface", source, tmp_path)
     assert record["click_count"] == 3
     assert record["crackle_repaired"] == 3
     assert record["removed_rms"]["rumble"] > record["removed_rms"]["dehiss"]

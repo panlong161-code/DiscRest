@@ -1,10 +1,10 @@
 recorded_platform: win32
-recorded_python: "3.12.7"
-recorded_numpy: "1.26.4"
-recorded_scipy: "1.16.3"
-click_count: 726
+recorded_python: 3.12.4
+recorded_numpy: 2.0.0
+recorded_scipy: 1.17.1
+click_count: 552
 flags:
 - dense-transient
-restored_sha256: 060f8925a7a9b6fcc3594b17ad23e3e20b496bc5aac623f0e4637715c09d94cd
-residual_sha256: de983568f95dbe486e99a94bcb4a51a800ca51c7b8cb7a469fc8bc5da11ff639
-clicks_sha256: 8e6cf6195d6629ea78fa2293027b8c8114f9c802553c6eaa9220ac16238a3031
+restored_sha256: 45b60deb343c1bef78339fddd337ba94e80630694cc940a8297c498dfa907c8c
+residual_sha256: bb14ff117b31bd5ee8107a9a2e78a9b53f9652c4f9c6a10cb1c77c9b73eb2926
+clicks_sha256: 4dced996850ec66d54d670a1d7e292c375288aa1e0a9fa5ce3a4a2458df4d9c7

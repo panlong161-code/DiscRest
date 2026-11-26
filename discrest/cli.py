@@ -44,6 +44,12 @@ def _build() -> argparse.ArgumentParser:
 
     commands.add_parser("presets", help="list product modes")
 
+    audition_parser = commands.add_parser(
+        "audition", help="write boosted removed audio and a spectrogram for an example"
+    )
+    audition_parser.add_argument("example_dir", help="directory containing input.wav and out/")
+    audition_parser.add_argument("--listen-dir", help="where to write the listening kit")
+
     profile_parser = commands.add_parser("profile", help="measure the file and suggest a preset")
     profile_parser.add_argument("--input", required=True, help="wav to measure; no audio is written")
 
@@ -73,6 +79,22 @@ def main(argv: list[str] | None = None) -> int:
             return 0
         if args.command == "ui":
             serve(port=args.port, open_browser=not args.no_browser)
+            return 0
+        if args.command == "audition":
+            from discrest.audition import build
+
+            info = build(Path(args.example_dir), Path(args.listen_dir) if args.listen_dir else None)
+            print(f"seconds: {info['seconds']:.1f}")
+            print(f"input: {info['input_db']:.1f} dBFS")
+            print(f"restored: {info['restored_db']:.1f} dBFS")
+            print(f"delta: {info['delta_db']:+.2f} dB")
+            for row in info["rows"]:
+                state = "on" if row["active"] else "off"
+                print(
+                    f"{row['stage']:10} {state:3} {row['level_db']:8.1f} dBFS "
+                    f"nonzero={row['nonzero'] * 100:.2f}% below80={row['low_share'] * 100:.0f}%"
+                )
+            print(f"listen: {info['listen_dir'] / 'index.html'}")
             return 0
         if args.command == "run":
             if args.preset:

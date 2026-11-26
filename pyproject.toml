@@ -1,15 +1,15 @@
 [build-system]
-requires = ["setuptools>=68"]
+requires = ["setuptools>=77"]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "discrest"
-version = "0.7.0"
+version = "0.8.1"
 description = "Local stepwise workbench for reproducible restoration of digitized disc recordings"
 readme = "README.md"
 requires-python = ">=3.10"
 license = "MIT"
-authors = [{ name = "DiscRest contributors" }]
+authors = [{ name = "Long Pan" }]
 keywords = ["audio", "restoration", "declick", "gramophone"]
 classifiers = [
   "Programming Language :: Python :: 3",
@@ -22,7 +22,8 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-dev = ["pytest>=8"]
+audition = ["soundfile>=0.12"]
+dev = ["pytest>=8", "soundfile>=0.12"]
 
 [project.scripts]
 discrest = "discrest.cli:main"

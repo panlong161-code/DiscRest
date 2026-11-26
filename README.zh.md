@@ -2,9 +2,9 @@
 
 DiscRest 是处理已数字化唱片的本地工作台。五步都可以单独关闭：去咔嗒、去裂纹、隆隆声高通、交流哼声陷波、去嘶声。每次运行写出修复结果、整段残差、每一级单独拿走的声音、带理由的咔嗒区间和一份冻结配置。音频只在本机处理。
 
-版本 0.7.0，许可 MIT。三档产品模式和本机工作台与命令行共用同一套参数。修复之前可以用 `profile` 看这段声音更接近哪一档；测量接近分界时，画像会标明不确定。`examples/archive_78` 是一段 1919 年未修复唱筒的 20 秒，并和 Audacity 2.1 的去咔嗒算法放在同一段上计数。这是算法重算，不是 Audacity 界面里的一次操作。
+版本 0.8.1，许可 MIT。三档产品模式和本机工作台与命令行共用同一套参数。修复之前可以用 `profile` 看这段声音更接近哪一档；测量接近分界时，画像会标明不确定。`examples/archive_78` 是一段 1919 年未修复唱筒的 20 秒，并和 Audacity 2.1.0 的去咔嗒算法放在同一段上计数。这是算法重算，不是 Audacity 界面里的一次操作。
 
-英文说明见 `README.md`。投稿用的英文稿见 `paper/softwarex-draft.md`。
+英文说明见 `README.md`。投稿论文不包含在代码仓库中。
 
 ## 安装
 
@@ -24,8 +24,8 @@ pip install -e ".[dev]"
 
 ```text
 python -m discrest presets
-python -m discrest profile --input examples/public_78/input.wav
-python -m discrest run --preset isolated --input examples/public_78/input.wav --output-dir out
+python -m discrest profile --input examples/public_cyl/input.wav
+python -m discrest run --preset isolated --input examples/public_cyl/input.wav --output-dir out
 python -m discrest ui
 ```
 
@@ -35,25 +35,28 @@ python -m discrest ui
 
 ## 复现示例
 
-三个示例是合成信号。`archive_78` 是 1919 年未修复唱筒的 20 秒。
+四个示例输入来自历史录音：`archive_78` 是 1919 年未修复唱筒的 20 秒，`public_cyl`、`dense_transient` 是美国加州大学圣塔芭芭拉分校圆柱档案的两条，`surface` 是一条真实 78 转。`loc_victor_78` 以美国国会图书馆转录为底稿，并通过 `overlay.py` 叠加可控的合成退化，用于已知真值测试；其他构造信号位于 `discrest/synthetic.py`。
 
 ```text
-python -m discrest run --config examples/public_78/run.yaml
-python -m discrest verify examples/public_78
+python -m discrest run --config examples/public_cyl/run.yaml
+python -m discrest verify examples/public_cyl
 python -m discrest verify examples/dense_transient
 python -m discrest verify examples/surface
 python -m discrest verify examples/archive_78
+python -m discrest verify examples/loc_victor_78
 ```
 
-`verify` 在每台机器上核对输出文件、咔嗒数和标记。SHA-256 只在记录这些哈希的环境上比对：Windows，Python 3.12.7，NumPy 1.26.4，SciPy 1.16.3。其他系统会打印 `hashes_recorded_on=win32`，仍然核对计数和标记。
+`verify` 在每台机器上核对输出文件、咔嗒数和标记。只有平台、Python、NumPy、SciPy 版本都与记录哈希的环境完全一致（Windows、Python 3.12.4、NumPy 2.0.0、SciPy 1.17.1）时才比对 SHA-256；否则仍核对计数和标记。
 
-`examples/public_78` 是 8 秒、44100 Hz 的三个乐音、轻微嘶声和 12 次孤立咔嗒。去咔嗒和去嘶声打开。这次运行修复 12 个区间，没有 `dense-transient`。
+`examples/public_cyl` 是 1910 年 Edison Amberol 473《My south polar expedition》的 20 秒，UCSB 圆柱 1859。只开去咔嗒。档案馆的访问副本已在 40 Hz 以下滤过，所以这次运行把 14 个区间全部修复，没有标记；低频几级改在 `examples/loc_victor_78` 上演示。
 
-`examples/dense_transient` 在 1 秒内每 80 个样本放一个脉冲。检测列出 726 个短区间，其中 701 个落在过密的窗里，`action` 为 `protected`，样本留在原处；另外 25 个被修复。还有 13 个长于 3 ms 的区间没有替换。日志是 `dense-transient`。
+`examples/dense_transient` 是 1906 年 Columbia 圆柱《'Tis but a dream》的 17.4 秒，UCSB 13692，一张磨损很重的唱片。检测列出 552 个区间，其中 485 个落在 45 个密集窗里被保护，67 个被修复；另有 28 个长于 3 ms 的区间没有替换。日志是 `dense-transient`。
 
-`examples/surface` 同时含 30 Hz 隆隆声、50 Hz 与 150 Hz 哼声、3 次咔嗒和 3 次更小的裂纹，并带一层嘶声。这次运行修复 3 个咔嗒区间和 3 处裂纹。`out/run.yaml` 里隆隆声的移除 RMS 约为 0.094，哼声约为 0.021。
+`examples/surface` 是一条真实 78 转转录的 20 秒，交流哼声很强，Freesound 18627，CC0。运行打开 50 Hz 陷波与去裂纹：`hum_prominence` 从 33.88 降到 1.19，修复 7 处裂纹，没有标记。高通没开，因为这份文件 40 Hz 以下没有可删的东西。
 
 `examples/archive_78` 列出 149 个区间：82 个修复，66 个因为过密留下，1 个因为起音留下。
+
+`examples/loc_victor_78` 用美国国会图书馆 Victor 73978（matrix B-28269）的真实转录跑隆隆声、哼声、嘶声三级，取 38–68 秒。交付的文件是母带，低频早已被滤掉，所以 `overlay.py` 在它上面按已知量叠加低频、工频和宽带噪声，并把未叠加的基底一起保留，这样才能算出真 SNR。`profile` 报 `low-frequency, mains-hum`。这次运行把 `rumble_ratio` 从 0.1781 降到 0.0006，`hum_prominence` 从 11.96 降到 1.60，哼声的泄漏守卫因 `occupied = 0.0000` 未触发回退。嘶声级在这段材料上是负结果：SNR 从 20.00 dB 降到 15.32 dB，原因是整段没有安静帧可用来估计噪声。详见该目录的 README。
 
 更换 `input.wav` 之后，先 `run`，再把 `out/run.yaml` 里的哈希和点击数抄进 `expected.yaml`，并写上当时的 `recorded_platform`。
 
@@ -70,6 +73,23 @@ python -m discrest verify examples/archive_78
 | `log.txt` | 点击数、保护数、裂纹数、长区间数、标记 |
 
 采样率策略：`native` 保持文件原来的采样率，`require` 在与 `expected_sample_rate` 不一致时停止，`resample` 变到该采样率并在记录里保留原始采样率。
+
+## 试听被移除的声音
+
+听不出修复效果有两个原因，都不是运行出错：
+
+1. `removed_*.wav` 五份都会写，**包括没有打开的那几级**。没运行的级写的是整段 0，所以 `examples/archive_78` 里的 `removed_hum.wav` 是静音，含义是"这一级没开"，不是"录音里没有交流声"。
+2. 真正被移走的量相对音乐很小。`examples/archive_78` 的去咔嗒只改了 0.49% 的样本、电平 −47 dBFS，`restored.wav` 与 `input.wav` 整体只差 0.02 dB。`examples/loc_victor_78` 的隆隆声移除 RMS 是 0.064，输出整体低 2.5 dB，但差值集中在 80 Hz 以下，笔记本扬声器放不出来。
+
+`audition` 为单个示例生成试听包：把移除量峰值归一化、截最大一处修复前后各 0.8 秒、再画一张频谱图。
+
+```text
+python -m discrest audition examples/archive_78
+```
+
+结果写到 `examples/archive_78/listen/`：运行过的每一级一份 `4_removed_<stage>_boosted.wav`，`5`–`7` 是片段（原声、修复、移除量），`8_spectrum.png` 是图，`index.html` 带播放器和各级读数。放大倍数写在页面上，波形除增益外未作改动。
+
+`audition` 是唯一带额外依赖的命令，需要 `soundfile`，用 `pip install "discrest[audition]"` 安装。五级处理本身只依赖 NumPy、SciPy、PyYAML。
 
 ## 技术路线
 
@@ -101,13 +121,17 @@ python -m discrest verify examples/archive_78
 
 密集脉冲、鼓点和齿音会进入检测列表。过密的窗记为 `protected`，理由是 `dense-transient`。稀疏的敲击如果后面跟着明显更响的衰减，理由是 `sustained-onset`，这一下也不替换。隆隆声、哼声或去嘶声若把乐音频点一并拿走，这一级会整段退回，日志写 `leakage-reverted`。分轨和带宽延拓仍分别属于 RESTORE 与 BEHM-GAN。
 
-通讯邮箱还没有写入仓库。投稿前把作者邮箱补进英文 README 和 `paper/softwarex-draft.md`。在此之前，问题可以开在 https://github.com/panlong161-code/DiscRest/issues 。
+## 支持
+
+问题咨询与技术支持可联系作者 Long Pan（`540432274@qq.com`），或在 https://github.com/panlong161-code/DiscRest/issues 提交。
+
+0.8.1 的代码见 https://github.com/panlong161-code/DiscRest/tree/v0.8.1 。
 
 Godsill SJ, Rayner PJW. Digital Audio Restoration. Springer; 1998. https://doi.org/10.1007/978-1-4471-1561-8
 
 Moliner E, Välimäki V. A two-stage U-Net for high-fidelity denoising of historical recordings. IEEE ICASSP; 2022. https://doi.org/10.1109/ICASSP43922.2022.9746977
 
-## 开发
+## 测试
 
 ```text
 pytest

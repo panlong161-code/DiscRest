@@ -17,7 +17,7 @@ PRESETS: list[dict[str, Any]] = [
         "title": "孤立咔嗒",
         "blurb": "清楚的爆点，并压低持续嘶声。",
         "cli": "sparse clicks, then hiss",
-        "example": "public_78",
+        "example": "public_cyl",
         "settings": {
             "sample_rate_policy": "native",
             "expected_sample_rate": 44100,
@@ -100,7 +100,7 @@ PRESETS: list[dict[str, Any]] = [
 ]
 
 _BY_ID = {item["id"]: item for item in PRESETS}
-EXAMPLES = {"public_78", "dense_transient", "surface"}
+EXAMPLES = {"public_cyl", "dense_transient", "surface", "loc_victor_78"}
 
 
 def get_preset(preset_id: str) -> dict[str, Any]:

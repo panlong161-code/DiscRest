@@ -1,0 +1,9 @@
+recorded_platform: win32
+recorded_python: 3.12.4
+recorded_numpy: 2.0.0
+recorded_scipy: 1.17.1
+click_count: 0
+flags: []
+restored_sha256: e91a06fc315d900d8951352983af8210f0c8f1305412ea3c7109b2dd4b357a83
+residual_sha256: 427f1d5a7e2328b393288df2c3864f35c7fa454d792b67903971b0ea9216e6e3
+clicks_sha256: 96a7109ac71b82877efd9ba43323bdb8446621350ba2fe1b84091b32e58849d2

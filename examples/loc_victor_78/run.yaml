@@ -1,0 +1,23 @@
+input: input.wav
+output_dir: out
+sample_rate_policy: native
+expected_sample_rate: 44100
+source: loc-victor-78
+rumble:
+  enabled: true
+  cutoff_hz: 40
+  order: 4
+hum:
+  enabled: true
+  mains_hz: 50
+  harmonics: 3
+  quality: 30
+declick:
+  enabled: false
+decrackle:
+  enabled: false
+dehiss:
+  enabled: true
+neural:
+  enabled: false
+  checkpoint: null

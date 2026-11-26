@@ -7,6 +7,7 @@ from pathlib import Path
 from typing import Any
 
 import numpy as np
+import scipy
 import yaml
 
 from discrest import __version__
@@ -243,13 +244,25 @@ _HASH_KEYS = ("restored_sha256", "residual_sha256", "clicks_sha256")
 _COUNT_KEYS = ("click_count", "flags")
 
 
-def keys_checked(expected: dict[str, Any], platform: str | None = None) -> tuple[str, ...]:
-    """Compare SHA-256 only on the platform that recorded the hashes."""
+def keys_checked(
+    expected: dict[str, Any],
+    platform: str | None = None,
+    python_version: str | None = None,
+    numpy_version: str | None = None,
+    scipy_version: str | None = None,
+) -> tuple[str, ...]:
+    """Compare SHA-256 only in the exact environment that recorded the hashes."""
     current = sys.platform if platform is None else platform
-    recorded = expected.get("recorded_platform")
-    if recorded in (None, "") or recorded == current:
-        return _HASH_KEYS + _COUNT_KEYS
-    return _COUNT_KEYS
+    current_versions = {
+        "recorded_python": python_version or ".".join(map(str, sys.version_info[:3])),
+        "recorded_numpy": numpy_version or np.__version__,
+        "recorded_scipy": scipy_version or scipy.__version__,
+    }
+    if expected.get("recorded_platform") != current:
+        return _COUNT_KEYS
+    if any(expected.get(key) != version for key, version in current_versions.items()):
+        return _COUNT_KEYS
+    return _HASH_KEYS + _COUNT_KEYS
 
 
 def verify_example(example_dir: str | Path) -> tuple[bool, str]:

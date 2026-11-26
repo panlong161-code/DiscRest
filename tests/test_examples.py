@@ -10,9 +10,9 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 def test_public_example_matches_the_recorded_hashes() -> None:
-    ok, message = verify_example(ROOT / "examples" / "public_78")
+    ok, message = verify_example(ROOT / "examples" / "public_cyl")
     assert ok, message
-    assert "clicks=12" in message
+    assert "clicks=14" in message
 
 
 def test_dense_example_matches_the_recorded_hashes() -> None:
@@ -24,5 +24,12 @@ def test_dense_example_matches_the_recorded_hashes() -> None:
 def test_surface_example_matches_the_recorded_hashes() -> None:
     ok, message = verify_example(ROOT / "examples" / "surface")
     assert ok, message
-    assert "clicks=3" in message
+    assert "clicks=0" in message
+    assert "flags=none" in message
+
+
+def test_loc_victor_example_matches_the_recorded_hashes() -> None:
+    ok, message = verify_example(ROOT / "examples" / "loc_victor_78")
+    assert ok, message
+    assert "clicks=0" in message
     assert "flags=none" in message
